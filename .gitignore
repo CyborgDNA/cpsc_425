@@ -1,3 +1,4 @@
 #Ignore
 *.pyc
+*.DS_Store
 /data
