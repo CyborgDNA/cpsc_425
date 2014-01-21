@@ -1,6 +1,6 @@
 from PIL import Image
 import numpy as np
-import math
+from math import pi, sqrt
 from scipy import signal
 
 
@@ -11,5 +11,5 @@ def gauss1d(sigma):
 
     # (1/(2*pi*sigma**2))*exp(- x^2 / (2*sigma^2))
     x = np.arange((-array_length+1)/2, (array_length+1)/2, 1)  # generates the distance from center array
-    x = (1/(2*math.pi*sigma**2))*np.exp(-np.square(x)/(2*sigma**2))  # calculates the gaussian function to each element
+    x = (1/(sqrt(2*pi)*sigma))*np.exp(-np.square(x)/(2*sigma**2))  # calculates the gaussian function to each element
     return x/sum(x)  # return the normalized array
