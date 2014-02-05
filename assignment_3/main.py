@@ -19,7 +19,14 @@ def ShowPyramid(pyramid):  # Shows the pyramid image
     #image.save('data/pyramid.png','PNG')
 
 
-def MakePyramid(im, minsize):  # Return a pyramid(list of sampled downsized images)
+def MakePyramid(im, minsize):
+    """
+    [I]:
+    --------
+    [O]:
+    --------
+    pyramid     Is a list of downsized sampled Images
+    """
     pyramid = [im]  # include the original image
     size = im.size[0]
 
