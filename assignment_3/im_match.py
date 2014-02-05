@@ -5,10 +5,10 @@ from scipy import signal
 import ncc
 from main import MakePyramid
 MIN_WIDTH = 15    # min width size of the reduced images on the pyramid
-THRESHOLD = 0.54  # mininum correlation factor to draw a red box
+THRESHOLD = 0.35  # mininum correlation factor to draw a red box
 
 
-def draw_match(image, pyramid, template_array_list):
+def draw_match(pyramid, image, template_array_list):
     """
     Draw the red boxes corresponding to a match on the template
 
@@ -32,7 +32,7 @@ def draw_match(image, pyramid, template_array_list):
             x = pointslist[0][p]
             y = pointslist[1][p]
             (i, j) = pyramid[curr_temp].size
-            draw.rectangle([(x, y), (x+i, y+j)], outline="red")
+            draw.rectangle([(x, y), (x+i, y+j)], outline="red", width=2)
         curr_temp += 1
     del draw
     im.show()
@@ -51,11 +51,11 @@ def FindTemplate(pyramid, image, threshold):
     None
     """
     match = []
-    for template in pyramid:
+    for template in [pyramid[0]]:
         match.append(ncc.normxcorr2D(image, template))
     thresholded_match_list = []
     for m in match:
-        thresholded_match_list.append(np.where(m > THRESHOLD, 1, 0))
+        thresholded_match_list.append(np.where(m >= THRESHOLD, 1, 0))
     return thresholded_match_list
 
 
@@ -74,4 +74,4 @@ def main():
     # finds the correlation between image and pyramid
     thresholded_match_list = FindTemplate(pyramid, image, THRESHOLD)
     # Marks matches on the given template
-    draw_match(image, pyramid, thresholded_match_list)
+    draw_match(pyramid, image, thresholded_match_list)
