@@ -4,7 +4,7 @@ import math
 from scipy import signal
 import ncc
 import sys
-from main import MakePyramid, ShowPyramid
+from pyramid import MakePyramid, ShowPyramid
 im_path = "data/"
 im_name = ["judybats.jpg", "students.jpg", "tree.jpg"]
 
