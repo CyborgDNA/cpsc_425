@@ -39,7 +39,7 @@ def MakePyramid(im, minsize):
 
 
 def main():
-    im = Image.open("data/template.jpg")  # loads the image
+    im = Image.open("data/judybats.jpg")  # loads the image
     minsize = 15  # minimum width of the last sample
     pyramid = MakePyramid(im, minsize)  # builds the pyramid list
     ShowPyramid(pyramid)  # show or save the pyramid image

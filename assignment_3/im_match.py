@@ -3,11 +3,13 @@ import numpy as np
 import math
 from scipy import signal
 import ncc
-from main import MakePyramid
-MIN_WIDTH = 15    # min width size of the reduced images on the pyramid
-THRESHOLD = 0.5  # mininum correlation factor to draw a red box
-
-
+from main import MakePyramid, ShowPyramid
+MIN_WIDTH = 15     # min width size of the reduced images on the pyramid
+THRESHOLD = 0.555  # 0.555  # mininum correlation factor to draw a red box
+min_t_w = 15       # 25,20
+im_path = "data/"
+im_name = ["judybats.jpg","students.jpg","tree.jpg"]
+im_num = 2
 def draw_match(pyramid, template, image_array_list):
     """
     Draw the red boxes corresponding to a match on the template
@@ -30,17 +32,20 @@ def draw_match(pyramid, template, image_array_list):
         pointslist = np.nonzero(image)
         print pyramid[curr_im].size
         print "###", curr_im
+        (i, j) = template.size
+        i /= 0.75 ** curr_im  # Resizes the red box
+        j /= 0.75 ** curr_im
+
         for p in range(len(pointslist[0])):
             x = pointslist[1][p] / (0.75) ** curr_im
             y = pointslist[0][p] / (0.75) ** curr_im
-            (i, j) = template.size
-            draw.rectangle([(x, y), (x+i * 0.75 ** curr_im, y+j * 0.75 ** curr_im)], outline="red")
-            # draw.point((x, y), "red")
+            draw.rectangle([(x-i/2, y-j/2), (x+i/2, y+j/2)], outline="red")
             print x, y
         print "///"
         curr_im += 1
     del draw
     im.show()
+    im.save(im_path+"output/"+im_name[im_num], "PNG")
 
 
 def FindTemplate(pyramid, template):
@@ -71,8 +76,10 @@ def main():
 
     # loads the template
     template = Image.open("data/template.jpg")
+    t = template.size
+    template = template.resize((min_t_w,int(template.size[1]*min_t_w/template.size[0])), Image.BICUBIC) 
     # loads the image where the match will be performed
-    image = Image.open("data/judybats.jpg")
+    image = Image.open(im_path+im_name[im_num])
     # builds the pyramid list
     pyramid = MakePyramid(image, MIN_WIDTH)
     # finds the correlation between image and pyramid
