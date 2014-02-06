@@ -5,11 +5,13 @@ from scipy import signal
 import ncc
 from main import MakePyramid, ShowPyramid
 MIN_WIDTH = 15     # min width size of the reduced images on the pyramid
-THRESHOLD = 0.555  # 0.555  # mininum correlation factor to draw a red box
+THRESHOLD = 0.503  # 0.555  # mininum correlation factor to draw a red box
 min_t_w = 15       # 25,20
 im_path = "data/"
 im_name = ["judybats.jpg","students.jpg","tree.jpg"]
 im_num = 2
+
+
 def draw_match(pyramid, template, image_array_list):
     """
     Draw the red boxes corresponding to a match on the template
@@ -45,7 +47,7 @@ def draw_match(pyramid, template, image_array_list):
         curr_im += 1
     del draw
     im.show()
-    im.save(im_path+"output/"+im_name[im_num], "PNG")
+    # im.save(im_path+"output/"+im_name[im_num], "PNG")
 
 
 def FindTemplate(pyramid, template):

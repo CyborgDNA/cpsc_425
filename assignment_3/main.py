@@ -7,14 +7,26 @@ import ncc
 RF = 0.75  # Resize Factor
 
 
-def ShowPyramid(pyramid):  # Shows the pyramid image
-    pyramid_width = sum([im.size[0] for im in pyramid][:-1])  # pyramid width is equal to the sum of all witdths
-    image = Image.new("L", (pyramid_width, pyramid[0].size[1]), "white")  # Creates a new image to paste the pyramid
-    x_offset = 0  # Offset used to place images side by side
+def ShowPyramid(pyramid):
+    """
+    Shows the pyramid image
 
+    [I]:
+    ---------
+    pyramid     A list of downsized images
+
+    """
+    # pyramid width is equal to the sum of all witdths
+    pyramid_width = sum([im.size[0] for im in pyramid][:-1])
+    # Creates a canvas to paste the pyramid
+    image = Image.new("L", (pyramid_width, pyramid[0].size[1]), "white")
+    # Offset used to place images side by side
+    x_offset = 0
     for im in pyramid:
-        image.paste(im, (x_offset, pyramid[0].size[1]-im.size[1]))  # Paste images side by side on the bottom
-        x_offset += im.size[0]  # Increases the ofsset of the next image
+        # Paste images side by side on the bottom of the canvas
+        image.paste(im, (x_offset, pyramid[0].size[1]-im.size[1]))
+        # Increases the ofsset of the next image
+        x_offset += im.size[0]
     image.show()
     #image.save('data/pyramid.png','PNG')
 
