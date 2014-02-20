@@ -8,35 +8,49 @@ import pickle
 #                        Functions for you to complete                       #
 ##############################################################################
 
+
 def ComputeSSD(TODOPatch, TODOMask, textureIm, patchL):
     patch_rows, patch_cols, patch_bands = np.shape(TODOPatch)
     tex_rows, tex_cols, tex_bands = np.shape(textureIm)
     ssd_rows = tex_rows - 2 * patchL
     ssd_cols = tex_cols - 2 * patchL
-    SSD = np.zeros((ssd_rows,ssd_cols))
+    SSD = np.zeros((ssd_rows, ssd_cols))
+    p = np.where(TODOMask == 0)
+    zippedP = zip(p[0], p[1])
+
     for r in range(ssd_rows):
         for c in range(ssd_cols):
             # Compute sum square difference between textureIm and TODOPatch
             # for all pixels where TODOMask = 0, and store the result in SSD
-            #
-            # ADD YOUR CODE HERE
-            #
-            pass
-        pass
+            # xslider = 0
+            # yslider = 0
+            # xim = len(tex_rows)
+            # yim = len(tex_cols)
+
+            # while xslider < xim:
+            if (r, c) in zippedP:
+                for d in range(3):
+                    SSD[r][c] += (1.0*textureIm[r][c][d] -
+                                  1.0*TODOPatch[r][c][d])**2
+                # xslider += len(patch_rows)
     return SSD
 
-def CopyPatch(imHole,TODOMask,textureIm,iPatchCenter,jPatchCenter,iMatchCenter,jMatchCenter,patchL):
+
+def CopyPatch(imHole, TODOMask, textureIm, iPatchCenter, jPatchCenter,
+              iMatchCenter, jMatchCenter, patchL):
     patchSize = 2 * patchL + 1
+    p = np.nonzero(TODOMask)
+    zippedP = zip(p[0], p[1])
+
     for i in range(patchSize):
         for j in range(patchSize):
-            # Copy the selected patch selectPatch into the image containing
-            # the hole imHole for each pixel where TODOMask = 1.
-            # The patch is centred on iPatchCenter, jPatchCenter in the image imHole
-            #
-            # ADD YOUR CODE HERE
-            #
-            pass
-        pass
+        # Copy the selected patch selectPatch into the image containing
+        # the hole imHole for each pixel where TODOMask = 1.
+        # The patch is centred on iPatchCenter,jPatchCenter in the image imHole
+            xH = i+iPatchCenter-patchSize/2
+            yH = j+jPatchCenter-patchSize/2
+            for (x, y) in zippedP:
+                imHole[xH][yH] = textureIm[x+iMatchCenter][y+iMatchCenter]
     return imHole
 
 ##############################################################################
@@ -217,9 +231,10 @@ while (nFill > 0):
         ssdIm = ComputeSSD(TODOPatch, TODOMask, textureIm, patchL)
 
         # Randomized selection of one of the best texture patches
-        ssdIm1 = np.sort(np.copy(ssdIm),axis=None)
-        ssdValue = ssdIm1[min(round(abs(random.gauss(0,randomPatchSD))),np.size(ssdIm1)-1)]
-        ssdIndex = np.nonzero(ssdIm==ssdValue)
+        ssdIm1 = np.sort(np.copy(ssdIm), axis=None)
+        ssdValue = ssdIm1[min(round(abs(random.gauss(0, randomPatchSD))),
+                              np.size(ssdIm1)-1)]
+        ssdIndex = np.nonzero(ssdIm == ssdValue)
         iSelectCenter = ssdIndex[0][0]
         jSelectCenter = ssdIndex[1][0]
 
@@ -231,7 +246,8 @@ while (nFill > 0):
         #
         # Copy patch into hole
         #
-        imHole = CopyPatch(imHole,TODOMask,textureIm,iPatchCenter,jPatchCenter,iSelectCenter,jSelectCenter,patchL)
+        imHole = CopyPatch(imHole, TODOMask, textureIm, iPatchCenter,
+                           jPatchCenter, iSelectCenter, jSelectCenter, patchL)
 
         # Update TODORegion and fillRegion by removing locations that overlapped the patch
         TODORegion[iPatchCenter-patchL:iPatchCenter+patchL+1,jPatchCenter-patchL:jPatchCenter+patchL+1] = 0
