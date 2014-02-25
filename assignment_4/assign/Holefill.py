@@ -3,6 +3,7 @@ import numpy as np
 import random
 import os.path
 import pickle
+OUTPATH = '../output/'
 
 ##############################################################################
 #                        Functions for you to complete                       #
@@ -10,47 +11,81 @@ import pickle
 
 
 def ComputeSSD(TODOPatch, TODOMask, textureIm, patchL):
+    """
+    Compute sum square difference between textureIm and TODOPatch
+    for all pixels where TODOMask = 0, and store the result in SSD
+
+    [I]:
+    TODOPatch   patch
+    TODOMask    mask where empty pixels are mapped to 1
+    textureIm   texture image
+    patchL      length of the patch
+
+    [O]:
+    SSD         sum of squared differences between patch and image
+    """
     patch_rows, patch_cols, patch_bands = np.shape(TODOPatch)
     tex_rows, tex_cols, tex_bands = np.shape(textureIm)
     ssd_rows = tex_rows - 2 * patchL
     ssd_cols = tex_cols - 2 * patchL
     SSD = np.zeros((ssd_rows, ssd_cols))
+
+    # tuples of points where the patch is not empty
     p = np.where(TODOMask == 0)
     zippedP = zip(p[0], p[1])
 
+    # Improvement suggested on Piazza
+    textureIm = textureIm.astype('float')
+    TODOPatch = TODOPatch.astype('float')
+
+    # for every way of sliding the patch over the image,
+    # it computes the sdd  of that match on the given points
+    # where the patch is non empty
     for r in range(ssd_rows):
         for c in range(ssd_cols):
-            # Compute sum square difference between textureIm and TODOPatch
-            # for all pixels where TODOMask = 0, and store the result in SSD
-            # xslider = 0
-            # yslider = 0
-            # xim = len(tex_rows)
-            # yim = len(tex_cols)
-
-            # while xslider < xim:
-            if (r, c) in zippedP:
-                for d in range(3):
-                    SSD[r][c] += (1.0*textureIm[r][c][d] -
-                                  1.0*TODOPatch[r][c][d])**2
-                # xslider += len(patch_rows)
+            for (x, y) in zippedP:  # non empty points
+                for d in range(patch_bands):  # sum over three channels(RGB)
+                        SSD[r][c] += (textureIm[r][c][d] -
+                                      TODOPatch[x][y][d])**2
     return SSD
 
 
 def CopyPatch(imHole, TODOMask, textureIm, iPatchCenter, jPatchCenter,
               iMatchCenter, jMatchCenter, patchL):
+    """
+    Copy the selected patch selectPatch into the image containing
+    the hole imHole for each pixel where TODOMask = 1.
+    The patch is centred on iPatchCenter,jPatchCenter in the image imHole
+    [I]:
+    imHole                          image to be filled with the texture
+    TODOMask                        mask where empty pixels are mapped to 1
+    textureIm                       texture image
+    iPatchCenter, jPatchCenter      x,y of the center of the patch in the hole
+    iMatchCenter, jMatchCenter      x,y of the center of match in the image
+    patchL                          patch length
+
+    [O]:
+    imHole      image with the hole filled by the new texture
+    """
+
     patchSize = 2 * patchL + 1
-    p = np.nonzero(TODOMask)
+    # empty points coordinates
+    p = np.where(TODOMask == 1)
     zippedP = zip(p[0], p[1])
 
     for i in range(patchSize):
         for j in range(patchSize):
-        # Copy the selected patch selectPatch into the image containing
-        # the hole imHole for each pixel where TODOMask = 1.
-        # The patch is centred on iPatchCenter,jPatchCenter in the image imHole
-            xH = i+iPatchCenter-patchSize/2
-            yH = j+jPatchCenter-patchSize/2
-            for (x, y) in zippedP:
-                imHole[xH][yH] = textureIm[x+iMatchCenter][y+iMatchCenter]
+            if (i, j) in zippedP:
+                # Hole coordinates
+                iH = i+iPatchCenter-patchSize/2
+                jH = j+jPatchCenter-patchSize/2
+                # Image coordinates
+                iI = i+iMatchCenter-patchSize/2
+                jI = j+jMatchCenter-patchSize/2
+                # copy the three RGB channels from the texture
+                # to the hole
+                for d in range(3):
+                    imHole[iH][jH][d] = textureIm[iI][jI][d]
     return imHole
 
 ##############################################################################
@@ -190,10 +225,12 @@ imHole[fill_indices] = 0
 if showResults == True:
     # original
     im.show()
+    im.save(OUTPATH+'donkey0.png', 'PNG')
     # convert to a PIL image, show fillRegion and draw a box around textureIm
     im1 = Image.fromarray(imHole).convert('RGB')
     im1 = DrawBox(im1,jTextureMin,iTextureMin,jTextureMax,iTextureMax)
     im1.show()
+    im1.save(OUTPATH+'donkey1.png', 'PNG')
     print "Are you happy with this choice of fillRegion and textureIm?"
     Yes_or_No = False
     while not Yes_or_No:
@@ -263,5 +300,7 @@ while (nFill > 0):
 # Output results
 #
 if showResults == True:
-    Image.fromarray(imHole).convert('RGB').show()
+    im2 = Image.fromarray(imHole).convert('RGB')
+    im2.show()
+    im2.save(OUTPATH+'donkey2.png', 'PNG')
 Image.fromarray(imHole).convert('RGB').save('results.jpg')
