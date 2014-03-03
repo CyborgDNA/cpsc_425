@@ -160,7 +160,7 @@ showResults = True
 # Read input image
 #
 
-im = Image.open('donkey.jpg').convert('RGB')
+im = Image.open('grass.png').convert('RGB')
 im_array = np.asarray(im, dtype=np.uint8)
 imRows, imCols, imBands = np.shape(im_array)
 
@@ -225,12 +225,12 @@ imHole[fill_indices] = 0
 if showResults == True:
     # original
     im.show()
-    im.save(OUTPATH+'donkey0.png', 'PNG')
+    im.save(OUTPATH+'grass0.png', 'PNG')
     # convert to a PIL image, show fillRegion and draw a box around textureIm
     im1 = Image.fromarray(imHole).convert('RGB')
     im1 = DrawBox(im1,jTextureMin,iTextureMin,jTextureMax,iTextureMax)
     im1.show()
-    im1.save(OUTPATH+'donkey1.png', 'PNG')
+    im1.save(OUTPATH+'grass1.png', 'PNG')
     print "Are you happy with this choice of fillRegion and textureIm?"
     Yes_or_No = False
     while not Yes_or_No:
@@ -302,5 +302,5 @@ while (nFill > 0):
 if showResults == True:
     im2 = Image.fromarray(imHole).convert('RGB')
     im2.show()
-    im2.save(OUTPATH+'donkey2.png', 'PNG')
+    im2.save(OUTPATH+'grass2.png', 'PNG')
 Image.fromarray(imHole).convert('RGB').save('results.jpg')
