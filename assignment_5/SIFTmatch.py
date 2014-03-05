@@ -2,6 +2,7 @@ from PIL import Image, ImageDraw
 import numpy as np
 import csv
 import math
+import random
 
 
 def ReadKeys(image):
@@ -101,28 +102,87 @@ def match(image1, image2):
     #
     # REPLACE THIS CODE WITH YOUR SOLUTION (ASSIGNMENT 5, QUESTION 3)
     #
+
     # Threshold is between 0 and 1
-    threshold = 0.6
+    threshold = 0.93
     print "Threshold = ", threshold
+    # number of times to run the RANSAC
+    rounds = 100
+    print "Rounds = ", rounds
+    # a list of pairs of keypoints matched in both images
     matched_pairs = []
+    # match keeps track of the indexes(values) of a given angle(key)
     match = {}
+    # measures
     for rowim1 in xrange(len(descriptors1)):
         for rowim2 in xrange(len(descriptors2)):
+            # the angle between the descriptors measures
+            # the similarity between them
             angle = math.acos(np.dot(descriptors1[rowim1],
                                      descriptors2[rowim2]))
             match[angle] = (rowim1, rowim2)
         sorted_match = sorted(match)
+        # best two matches
         first_nearest_neighbor = sorted_match[0]
         second_nearest_neighbor = sorted_match[1]
+        # any bestmatch suficiently closer(threshold) to a second
+        # minimum match is a match that we wan to keep
         if first_nearest_neighbor/second_nearest_neighbor < threshold:
             key1, key2 = match[first_nearest_neighbor]
             matched_pairs.append([keypoints1[key1], keypoints2[key2]])
         match = {}
+    # calls ransac over the raw pairs
+    matched_pairs = ransac(matched_pairs, keypoints1, keypoints2, rounds)
     #
     # END OF SECTION OF CODE TO REPLACE
     #
     im3 = DisplayMatches(im1, im2, matched_pairs)
     return im3
 
+
+def ransac(matched_pairs, keypoints1, keypoints2, rounds):
+    """
+    Applies the RANSAC algorithm to the matched_pairs in order to
+    reduce the amount of false positives.
+
+    [I]:
+    matched_pairs   the matched keypoints pairs calculated by match()
+    keypoints1      the keypoints on the first image
+    keypoints2      the keypoints on the second image
+    rounds          the amount of subsets to be generated and compared
+    [O]:
+    best_matched_pairs  the best keypoints subset after the given rounds
+    """
+    # a list of keypoints of the best subset
+    best_matched_pairs = []
+    # subset keypoints pairs
+    subset_pairs = []
+    for i in range(rounds):
+        # matched keypoins 1 and 2 chosen randomly from
+        # the original matched_pairs
+        km1, km2 = random.choice(matched_pairs)
+        subset_pairs.append([km1, km2])
+        # compares the random match with all the others
+        for k1, k2 in matched_pairs:
+            # row, columm, scale, orientation for the random pair
+            _, _, sm1, om1 = km1
+            _, _, sm2, om2 = km2
+            # row, columm, scale, orientation for the other pairs
+            _, _, s1, o1 = k1
+            _, _, s2, o2 = k2
+            # we will keep all the keypoints with scale and
+            # orientantion close to the random match
+            if(math.fabs(om1-om2-math.pi/6) < math.fabs(o1-o2)
+               and math.fabs(om1-om2+math.pi/6) > math.fabs(o1-o2)
+               and math.fabs(sm1-sm2)*0.5 < math.fabs(s1-s2)
+               and math.fabs(sm1-sm2)*1.5 > math.fabs(s1-s2)):
+                subset_pairs.append([k1, k2])
+        # the largest subset is the one the we want to keep
+        if(len(subset_pairs) > len(best_matched_pairs)):
+            best_matched_pairs = subset_pairs
+        subset_pairs = []
+    return best_matched_pairs
+
 #Test run...
-match('scene', 'basmati')
+# match('scene', 'book')
+match('library2', 'library')
