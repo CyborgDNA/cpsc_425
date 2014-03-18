@@ -14,7 +14,8 @@ def im_prep(image):
 
 
 def gaussconvolve2d(image, sigma):
-    im = signal.convolve2d(im_prep(image), gauss2d(sigma), 'same')  # applies the gaussian blur on the array
-    im = Image.fromarray(im)  # converts it back to image representation
-    im = im.convert("RGB")
-    im.save(IMG_PATH+"out_img2.png","PNG")
+    im = signal.convolve2d(image, gauss2d(sigma), 'same')  # applies the gaussian blur on the array
+    # im = Image.fromarray(im)  # converts it back to image representation
+    # im = im.convert("RGB")
+    # im.save(IMG_PATH+"out_img2.png","PNG")
+    return im
