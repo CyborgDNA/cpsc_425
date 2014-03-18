@@ -5,7 +5,7 @@ import math
 from scipy import signal
 import numpy.linalg as lin
 import sys
-
+from datetime import datetime
 # START OF FUNCTIONS CARRIED FORWARD FROM ASSIGNMENT 2
 
 sys.path.append('..')
@@ -20,6 +20,15 @@ from assignment_2.q4 import gaussconvolve2d
 
 
 def boxconvolve2d(image, n):
+    """
+    Convolve the image with a boxfilter of size n.
+
+    [I]:
+    image   the image to be convolve2d
+    n       the size of the box filter
+    [O]:
+    return  convolved image
+    """
     return signal.convolve2d(image, boxfilter(n))
 
 
@@ -40,6 +49,19 @@ def Estimate_Derivatives(im1, im2, sigma=1.5, n=3):
 
 
 def Optical_Flow(im1, im2, x, y, window_size, sigma=1.5, n=3):
+    """
+    Calculates the new coordinates of the point due to position changes in
+    the scene.
+    [I]:
+    im1         original image
+    im2         is im1 under position changes
+    x,y         x,y original coordinates
+    window_size size of the window where the optical flow equation is computed
+    sigma       sigma parameter for the gaussian filter
+    n           size of the boxfilter
+    [O]:
+    V[1],V[0]   new x,y coordinates
+    """
     assert((window_size % 2) == 1), "Window size must be odd"
     # UNCOMMENT THE NEXT LINE WHEN YOU HAVE COMPLETED Estimate_Derivatives
     Ix, Iy, It = Estimate_Derivatives(im1, im2, sigma, n)
@@ -52,19 +74,14 @@ def Optical_Flow(im1, im2, x, y, window_size, sigma=1.5, n=3):
     # #
     win_Iy = Iy[y-half-1:y+half, x-half-1:x+half].T.flatten()
     win_It = It[y-half-1:y+half, x-half-1:x+half].T.flatten()
-    # print win_Ix.shape (21, 21)
 
     A = np.vstack([win_Ix, win_Iy])
-    A = np.matrix(A)
     At = A.T
-    V = At*lin.pinv(A*At)
-    V = ((-1)*win_It*V)
-    # #################################
-    # # change the return line to:
-    return V[0,1], V[0,0]
-    # # (when you have completed the implementation)
-    # #################################
-    # return -1, 2  # skeleton program returns a hard-coded value
+    V = np.dot(At, lin.pinv(np.dot(A, At)))
+    V = np.dot((-1)*win_It, V)
+
+    print V[1], V[0]
+    return V[1], V[0]
 
 
 def AppendImages(im1, im2):
@@ -102,6 +119,8 @@ def DisplayFlow(im1, im2, x, y, uarr, varr):
 		yinit += v
     draw.line((x, y, offset+xinit, yinit), fill="yellow", width=2)
     im3.show()
+    
+    im3.save('output_'+str(datetime.now())+'.png','PNG')
     del draw
     return im3
 
@@ -148,10 +167,10 @@ y = 65
 ##############################################################################
 
 # window size (for estimation of optical flow)
-window_size=21
+window_size=5#11#21
 
 # sigma of the 2D Gaussian (used in the estimation of Ix and Iy)
-sigma=1.5
+sigma=0.9
 
 # size of the boxfilter (used in the estimation of It)
 n = 3
@@ -168,13 +187,13 @@ PIL_im2 = Image.open('frame08.png')
 im1 = np.asarray(PIL_im1)
 im2 = np.asarray(PIL_im2)
 dx, dy = Optical_Flow(im1, im2, x, y, window_size, sigma, n)
-print 'Optical flow: [', dx, ',', dy, ']'
-plt.imshow(im1, cmap='gray')
-plt.hold(True)
-plt.plot(x,y,'xr')
-plt.plot(x+dx*scale,y+dy*scale, 'dy')
-print 'Close figure window to continue...'
-plt.show()
+# print 'Optical flow: [', dx, ',', dy, ']'
+# plt.imshow(im1, cmap='gray')
+# plt.hold(True)
+# plt.plot(x,y,'xr')
+# plt.plot(x+dx*scale,y+dy*scale, 'dy')
+# print 'Close figure window to continue...'
+# plt.show()
 uarr = [dx]
 varr = [dy]
 
