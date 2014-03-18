@@ -186,3 +186,4 @@ def ransac(matched_pairs, keypoints1, keypoints2, rounds):
 #Test run...
 # match('scene', 'book')
 match('library2', 'library')
+# match('scene', 'box')
