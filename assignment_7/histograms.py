@@ -18,25 +18,24 @@ def histograms(length, nbins, colors, grays):
 
     # Initialize gray histogram
     grayhs = np.zeros((length, nbins), dtype=np.uint16)
-
+    gbins = np.zeros(nbins+1, dtype=np.uint16)
     # Compute gray histograms
     for i in range(length):
         v_gray = grays[[i], :, :]
-        grayhs[i] = np.histogram(v_gray.flatten(),
-                                 bins=nbins, range=(0, 255))[0]
-
+        grayhs[i], gbins = np.histogram(v_gray.flatten(),
+                                        bins=nbins, range=(0, 255))
     # Plot Grayscale Histogram
     plt.figure(1)
-    plt.plot(sum(grayhs[:, 0:10]))
-    plt.title("Grayscale Histogram")
+    plt.plot(sum(grayhs[:, 0:nbins]))
+    plt.title("Gray scale Histogram")
     plt.xlabel("bin number")
     plt.ylabel("observations")
     plt.savefig("out/histograms/grayhs.jpg")
 
     # Plot R,G,B Histogram
-    red = sum(colorhs[:, 0:10])
-    green = sum(colorhs[:, 11:20])
-    blue = sum(colorhs[:, 21:30])
+    red = sum(colorhs[:, 0:nbins])
+    green = sum(colorhs[:, nbins+1:2*nbins])
+    blue = sum(colorhs[:, 2*nbins+1:3*nbins])
     plt.figure(2)
     plt.title("R,G,B Histogram")
     rp, = plt.plot(red, color="red")

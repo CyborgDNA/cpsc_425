@@ -42,9 +42,8 @@ def clustering(length, nbins, colorhs, grayhs, colors, grays):
     ndim = nbins*3
     cs = np.zeros((clusters, ndim))  # cluster centres
     idxs_color = np.zeros(length)
-    """ <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> STILL NEED TO WHITEN THE IMAGE
-    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"""
+
+    colorhs = whiten(colorhs)
 
     # Kmeans on Color
     for dim in range(ndim):
@@ -65,7 +64,7 @@ def clustering(length, nbins, colorhs, grayhs, colors, grays):
 def plot_cluster(length, clusters, idxs_color, idxs_gray, colors, grays):
     # Kmeans on Color Plot
     plt.figure(3)
-    plt.plot(range(length), idxs_color)
+    plt.bar(range(length), idxs_color, width=1)
     plt.title("K-means clustering(color)")
     plt.xlabel("frame number")
     plt.ylabel("assigned cluster")
@@ -81,7 +80,7 @@ def plot_cluster(length, clusters, idxs_color, idxs_gray, colors, grays):
 
     # Kmeans on grays Plot
     plt.figure(4)
-    plt.plot(range(length), idxs_gray)
+    plt.bar(range(length), idxs_gray, width=1)
     plt.title("K-means clustering(gray)")
     plt.xlabel("frame number")
     plt.ylabel("assigned cluster")
